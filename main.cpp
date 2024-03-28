@@ -11,26 +11,14 @@
 // http://learnopengl.com/code_viewer.php?code=getting-started/hellowindow2
 // The code originally used GLEW, I replaced it with Glad
 
-
-// Function prototypes
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
-//void Draw(VAO& VAO1, Shader& shaderProgram, GLFWwindow* window);
-
 //https://github.com/k41531/opengl-mac/blob/main/VAO.h
 //https://tokoik.github.io/GLFWdraft.pdf
 
 // Window dimensions
 const GLuint WIDTH = 800, HEIGHT = 600;
 
-//debug用のコールバック関数
-void APIENTRY debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
-GLsizei length, const GLchar* message, const void* userParam) {
-// エラー情報を出力する
-std::cerr << "OpenGL debug message: " << message << std::endl;
-}
-
 int main(){
-    
+
     glfwInit();// Init GLFW
 
     // Set all the required options for GLFW
@@ -38,12 +26,8 @@ int main(){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-
-    Window window;
- 
     glfwSwapInterval(1);// 垂直同期のタイミングを待つ
-    //glfwSetKeyCallback(window, key_callback);// Set the required callback functions
-
+    
     // Load OpenGL functions, gladLoadGL returns the loaded version, 0 on error.
     int version = gladLoadGL(glfwGetProcAddress);
     if (version == 0){
@@ -51,13 +35,12 @@ int main(){
         return -1;
     }
 
-    
+    Window window;
+
     glClearColor(1.0f, 1.0f, 1.0f, 0.0f);// 背景色を指定する
     glViewport(0, 0, WIDTH, HEIGHT);// Define the viewport dimensions
-    //std::cout << "current path = " << std::filesystem::current_path() << std::endl; 
-    //return -1;
+
     auto vertexFile = "./shaders/point.vert", fragFile = "./shaders/point.frag";
-    // Generates Shader object using shaders defualt.vert and default.frag
 	Shader shaderProgram(vertexFile, fragFile);
 
     // uniform 変数の場所を取得する
@@ -94,11 +77,4 @@ int main(){
 	// Delete window before ending the program
 	glfwTerminate();// Terminate GLFW before ending the program
     return 0;
-}
-
-// Is called whenever a key is pressed/released via GLFW
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
-{
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GL_TRUE);
 }

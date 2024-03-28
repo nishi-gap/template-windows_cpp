@@ -12,6 +12,7 @@ class Window
     GLfloat scale;// ワールド座標系に対するデバイス座標系の拡大率 
     GLfloat location[2]; // 図形の正規化デバイス座標系上での位置
 
+    int keyStatus;// キーボードの状態
     public:
     // コンストラクタ
     Window(int width = 640, int height = 480, const char *title = ""): 
@@ -31,7 +32,8 @@ class Window
         glfwSwapInterval(1); // 垂直同期のタイミングを待つ   
         glfwSetWindowUserPointer(window, this); // このインスタンスの this ポインタを記録しておく
         glfwSetWindowSizeCallback(window, resize); // ウィンドウのサイズ変更時に呼び出す処理の登録        
-        glfwSetScrollCallback(window, wheel);// マウスホイール操作時に呼び出す処理の登録
+        glfwSetScrollCallback(window, wheel);// マウスホイール操作時に呼び出す処理の登録       
+        glfwSetKeyCallback(window, keyboard); // キーボード操作時に呼び出す処理の登録
         resize(window, width, height); // 開いたウィンドウの初期設定
     }
 
@@ -42,7 +44,9 @@ class Window
 
      // 描画ループの継続判定
     explicit operator bool(){
-        glfwWaitEvents();// イベントを取り出す
+       
+        if (keyStatus == GLFW_RELEASE) glfwWaitEvents();
+        else glfwPollEvents();// イベントを取り出す
         
         // マウスの左ボタンの状態を調べる
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) != GLFW_RELEASE){
@@ -83,12 +87,18 @@ class Window
 
       // マウスホイール操作時の処理
     static void wheel(GLFWwindow *window, double x, double y){
-    
-    Window *const instance(static_cast<Window *>(glfwGetWindowUserPointer(window)));// このインスタンスの this ポインタを得る
-        if (instance != NULL){
-            instance->scale += static_cast<GLfloat>(y);// ワールド座標系に対するデバイス座標系の拡大率を更新する
-        }
+        Window *const instance(static_cast<Window *>(glfwGetWindowUserPointer(window)));// このインスタンスの this ポインタを得る
+            if (instance != NULL){
+                instance->scale += static_cast<GLfloat>(y);// ワールド座標系に対するデバイス座標系の拡大率を更新する
+            }
     }
+
+     // キーボード操作時の処理
+    static void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods){     
+        Window *const instance(static_cast<Window *>(glfwGetWindowUserPointer(window)));// このインスタンスの this ポインタを得る
+        if (instance != NULL) instance->keyStatus = action; // キーの状態を保存する        
+    }
+    
     const GLfloat *getSize() const { return size; }// ウィンドウのサイズを取り出す
     GLfloat getScale() const { return scale; } // ワールド座標系に対するデバイス座標系の拡大率を取り出す
     const GLfloat *getLocation() const { return location; }// 位置を取り出す

@@ -5,6 +5,7 @@ project(sample_glad)
 
 # 必須ライブラリの存在チェック
 find_package(glfw3 REQUIRED)
+find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 #find_package(glm REQUIRED)
 
 # glad関係
@@ -26,6 +27,7 @@ add_executable(sample_glad main.cpp ${SHADER_SOURCES} shaderClass.cpp)# 実行�
 # 実行ファイルにリンクするライブラリの指定
 #target_link_libraries(sample_glad glad glfw glm ${CMAKE_DL_LIBS})
 target_link_libraries(sample_glad glad glfw ${CMAKE_DL_LIBS})
+target_link_libraries (sample_glad Eigen3::Eigen)
 
 # c++20を使う
 set_property(TARGET sample_glad PROPERTY CXX_STANDARD 20)
