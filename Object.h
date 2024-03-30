@@ -9,7 +9,7 @@ class Object{
 public:
     // 頂点属性
     struct Vertex{
-        GLfloat position[2];// 位置
+        GLfloat position[3];// 位置
     };
     // コンストラクタ
     // size: 頂点の位置の次元

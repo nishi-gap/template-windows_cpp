@@ -4,6 +4,14 @@
 #include <GLFW/glfw3.h>
 
 // ウィンドウ関連の処理
+//GLFWAPI GLFWwindow* glfwCreateWindow(int width, int height, const char* title, GLFWmonitor* monitor, GLFWwindow* share);
+/*
+    width
+    heghit
+    title
+    monitor:    フルスクリーンでなければNULL
+    share:      他のウィンドウとリソース共有、しないならNULL    
+ */
 class Window
 {
  
