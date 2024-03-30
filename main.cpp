@@ -58,7 +58,9 @@ constexpr Object::Vertex octahedronVertex[] =
  { 1.0f, 0.0f, 0.0f },
  { 0.0f, 0.0f, -1.0f }
 };
-    
+std::vector<Eigen::Vector3d> cube_vertices{Eigen::Vector3d(-1,0,0), Eigen::Vector3d(0,0,0), Eigen::Vector3d(0,1,0), Eigen::Vector3d(-1,-1,0),
+Eigen::Vector3d(-1,0,1), Eigen::Vector3d(0,0,1), Eigen::Vector3d(0,1,1), Eigen::Vector3d(-1,-1,1)};
+std::vector<std::vector<int>> cube_indices{{0,1,2,3}, {1,2,5,6}, {0,1,5,3}, {0,3,7,4}, {3,2,6,7}, {4,5,6,7}};
     std::unique_ptr<const Shape> shape(new Shape(3, 12, octahedronVertex));// 図形データを作成する
     Eigen::Matrix4d M_scale = Eigen::Matrix4d::Identity(), 
     M_trans = Eigen::Matrix4d::Identity(), model = Eigen::Matrix4d::Identity();
