@@ -1,5 +1,4 @@
-#ifndef SHADER_CLASS_H
-#define SHADER_CLASS_H
+#pragma once
 
 #include<glad/gl.h>
 #include<string>
@@ -23,4 +22,3 @@ public:
 	void Activate();// Activates the Shader Program
 	void Delete();// Deletes the Shader Program
 };
-#endif

@@ -1,6 +1,7 @@
 #version 150 core
 out vec4 fragment;
+in vec4 vertex_color;
 void main()
 {
- fragment = vec4(1.0, 0.0, 0.0, 1.0);
+ fragment = vertex_color;
 }

@@ -53,8 +53,7 @@ class Window
      // 描画ループの継続判定
     explicit operator bool(){
        
-        if (keyStatus == GLFW_RELEASE) glfwWaitEvents();
-        else glfwPollEvents();// イベントを取り出す
+        glfwPollEvents();// イベントを取り出す
         
         // マウスの左ボタンの状態を調べる
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) != GLFW_RELEASE){

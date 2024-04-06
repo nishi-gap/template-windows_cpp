@@ -88,9 +88,10 @@ Shader::Shader(const std::string& vertexFile, const std::string& fragmentFile){
 	}
 	glDeleteShader(fragmentShader);
 	
-	glLinkProgram(ID);// Wrap-up/Link all the shaders together into the Shader Program
 	glBindAttribLocation(ID, 0, "position");
 	glBindFragDataLocation(ID, 0, "fragment");
+	glBindAttribLocation(ID, 1, "color");
+	glLinkProgram(ID);// Wrap-up/Link all the shaders together into the Shader Program
 
 	// プログラムオブジェクトが作成できなければ 0 を返す
 	if (!printProgramInfoLog(ID))this->Delete();	
