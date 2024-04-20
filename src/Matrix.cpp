@@ -44,7 +44,7 @@ Matrix4d getPerspective(const double fovy, const double aspect, const double nea
 Matrix4d getRotate(const double a, Eigen::Vector3d axis){
     axis = axis.normalized();
     Quaterniond quat;
-    quat = AngleAxisd(a,axis);  //Y軸周りに90度反時計回りに回転
+    quat = AngleAxisd(a,axis); 
     Eigen::Matrix4d t = Eigen::Matrix4d::Identity();  // 4x4の単位行列を作成
     t.block<3,3>(0,0) = quat.matrix();;  // 左上の3x3ブロックにmを設定
     return t;

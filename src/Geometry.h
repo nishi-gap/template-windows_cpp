@@ -58,8 +58,11 @@ namespace GeoElement{
         void setHalfEdgePair(const std::shared_ptr<HalfEdge>& h1, const std::shared_ptr<HalfEdge>& h2);
         void deleteVertex(const std::shared_ptr<Vertex>& v);
         void deleteFace(const std::shared_ptr<Face>& f);
+        
     public:
         void addFace(const std::vector<std::shared_ptr<Vertex> >& vertices);
         std::vector<std::shared_ptr<Vertex> > getTriangleMeshes();
+        void getSphere(double& r, Eigen::Vector3d& center);
+        void moveCenter();
     };
 }

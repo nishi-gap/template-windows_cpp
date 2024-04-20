@@ -34,4 +34,3 @@ target_link_libraries (sample_glad Eigen3::Eigen SRC_DIR)
 # C++の標準規格の指定
 target_compile_features(sample_glad PUBLIC cxx_std_20)
 
-

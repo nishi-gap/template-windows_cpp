@@ -57,8 +57,7 @@ namespace GLObject{
     public:
         // コンストラクタ
         // vertices: 頂点属性を格納した配列
-        ShapeIndex(const std::vector<std::shared_ptr<GeoElement::Vertex> >& vertices): 
-            Shape(vertices), indexcount(vertices.size()){}
+        ShapeIndex(const std::vector<std::shared_ptr<GeoElement::Vertex> >& vertices);
         virtual void execute() const;// 描画の実行
     };
 

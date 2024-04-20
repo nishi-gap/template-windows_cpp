@@ -52,7 +52,10 @@ int main(){
     std::string objfile = "../cube.obj";
     std::shared_ptr<GeoElement::Mesh> mesh = loadOBJ(objfile);
     auto loadvertices = mesh->getTriangleMeshes();
+    double cam_distance = 0.0; Eigen::Vector3d target_center(0,0,0);
     
+    mesh->getSphere(cam_distance, target_center);
+
     // uniform 変数の場所を取得する
     const GLint modelviewLoc(glGetUniformLocation(shaderProgram.ID, "modelview"));
     const GLint projectionLoc(glGetUniformLocation(shaderProgram.ID, "projection"));
@@ -60,7 +63,7 @@ int main(){
     std::unique_ptr<const GLObject::Shape> shape(new GLObject::SolidShapeIndex(loadvertices)); // 図形データを作成する
     Eigen::Matrix4d M_trans = Eigen::Matrix4d::Identity(), model = Eigen::Matrix4d::Identity();
 
-    glfwSetTime(0.0);// タイマーを 0 にセット
+    
     while (window){
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -74,17 +77,19 @@ int main(){
         const GLfloat fovy(window.getScale() * 0.01);
         const GLfloat aspect(size[0] / size[1]);
         const GLfloat *const position(window.getLocation()); // 平行移動の変換行列を求める
-        auto r = getRotate(static_cast<double>(glfwGetTime()), Eigen::Vector3d(0,1,0));
+        //auto r = getRotate(static_cast<double>(glfwGetTime()), Eigen::Vector3d(0,1,0));
         //M_scale(0,0) = scale / size[0]; M_scale(1,1) = scale / size[1];
-        M_trans(0,3) = position[0]; M_trans(1,3) = position[1]; 
-
-        model = M_trans * r; // モデル変換行列を求める
+        
+        model = window.getCameraPosition(); // モデル変換行列を求める
 
         // ビュー変換行列を求める
-        Eigen::Vector3d eye(3,3,3), center(0,0,0), up(0,1,0);
+        Eigen::Vector3d eye(3,3,3), center(target_center), up(0,1,0);
+        const double scale_margin = 1.1;
+        //eye = eye.normalized() * cam_distance * scale_margin;
+
         Eigen::Matrix4d view = getLookAt(eye, center, up);
         std::vector<GLfloat> view_data = Mat2Array(view * model);
-        std::vector<GLfloat> prj_data = Mat2Array(getPerspective(fovy,aspect, 1.0f, 10.0));
+        std::vector<GLfloat> prj_data = Mat2Array(getPerspective(fovy,aspect, 1.0f, 100.0));
         
         // uniform 変数に値を設定する
         glUniformMatrix4fv(modelviewLoc, 1, GL_FALSE, view_data.data());
@@ -148,5 +153,6 @@ std::shared_ptr<GeoElement::Mesh> loadOBJ(const std::string& filename) {
             }
             mesh->addFace(_vertices);
         }
+        mesh->moveCenter();
         return mesh;
     }

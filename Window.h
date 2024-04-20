@@ -2,6 +2,7 @@
 #include <iostream>
 #include <glad/gl.h>// GLAD
 #include <GLFW/glfw3.h>
+#include "src/ArcBall.h"
 
 // ウィンドウ関連の処理
 //GLFWAPI GLFWwindow* glfwCreateWindow(int width, int height, const char* title, GLFWmonitor* monitor, GLFWwindow* share);
@@ -20,11 +21,15 @@ class Window
     GLfloat scale;// ワールド座標系に対するデバイス座標系の拡大率 
     GLfloat location[2]; // 図形の正規化デバイス座標系上での位置
 
+    ArcBall arcball;
+    int mouseStatus;// マウスの状態 -1:押されていない 0:押された 1:ドラッグ中
+    int cursolPos[2];// マウスカーソルの位置
+
     int keyStatus;// キーボードの状態
-    public:
+public:
     // コンストラクタ
     Window(int width = 640, int height = 480, const char *title = ""): 
-        window(glfwCreateWindow(width, height, title, NULL, NULL)), scale(100.0f), location{ 0.0f, 0.0f }{
+        window(glfwCreateWindow(width, height, title, NULL, NULL)), scale(100.0f), location{ 0.0f, 0.0f }, mouseStatus(-1){
         if (window == NULL){
             std::cerr << "Can't create GLFW window." << std::endl;// ウィンドウが作成できなかった
             exit(1);
@@ -43,6 +48,8 @@ class Window
         glfwSetScrollCallback(window, wheel);// マウスホイール操作時に呼び出す処理の登録       
         glfwSetKeyCallback(window, keyboard); // キーボード操作時に呼び出す処理の登録
         resize(window, width, height); // 開いたウィンドウの初期設定
+
+        arcball = ArcBall();
     }
 
     // デストラクタ
@@ -59,17 +66,17 @@ class Window
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) != GLFW_RELEASE){
             double x, y;// マウスの左ボタンが押されていたらマウスカーソルの位置を取得する
             glfwGetCursorPos(window, &x, &y);
-            // マウスカーソルの正規化デバイス座標系上での位置を求める
-            location[0] = static_cast<GLfloat>(x) * 2.0f / size[0] - 1.0f;
-            location[1] = 1.0f - static_cast<GLfloat>(y) * 2.0f / size[1];
-        } 
+            double curX = x * 2.0 / size[0] - 1.0, curY = 1.0 - y * 2.0 / size[1];
+            arcball.cb_mouse(0, GLFW_PRESS, curX, curY);
+        }else arcball.cb_mouse(0, GLFW_RELEASE, -1, -1);
 
         // キーボードの状態を調べる
-        if (glfwGetKey(window, GLFW_KEY_LEFT) != GLFW_RELEASE)location[0] -= 2.0f / size[0];
-        else if (glfwGetKey(window, GLFW_KEY_RIGHT) != GLFW_RELEASE)location[0] += 2.0f / size[0];
-        if (glfwGetKey(window, GLFW_KEY_DOWN) != GLFW_RELEASE)location[1] -= 2.0f / size[1];
-        else if (glfwGetKey(window, GLFW_KEY_UP) != GLFW_RELEASE)location[1] += 2.0f / size[1];
-
+        //if (glfwGetKey(window, GLFW_KEY_LEFT) != GLFW_RELEASE)location[0] -= 2.0f / size[0];
+        //else if (glfwGetKey(window, GLFW_KEY_RIGHT) != GLFW_RELEASE)location[0] += 2.0f / size[0];
+        //if (glfwGetKey(window, GLFW_KEY_DOWN) != GLFW_RELEASE)location[1] -= 2.0f / size[1];
+        //else if (glfwGetKey(window, GLFW_KEY_UP) != GLFW_RELEASE)location[1] += 2.0f / size[1];
+        
+        
         return !glfwWindowShouldClose(window)&& !glfwGetKey(window, GLFW_KEY_ESCAPE);// ウィンドウを閉じる必要がなければ true を返す
     }
 
@@ -96,18 +103,25 @@ class Window
     static void wheel(GLFWwindow *window, double x, double y){
         Window *const instance(static_cast<Window *>(glfwGetWindowUserPointer(window)));// このインスタンスの this ポインタを得る
             if (instance != NULL){
-                instance->scale += static_cast<GLfloat>(y);// ワールド座標系に対するデバイス座標系の拡大率を更新する
+                //instance->scale += static_cast<GLfloat>(y);// ワールド座標系に対するデバイス座標系の拡大率を更新する
+                instance->arcball.updateRidius(y);
             }
     }
 
      // キーボード操作時の処理
     static void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods){     
         Window *const instance(static_cast<Window *>(glfwGetWindowUserPointer(window)));// このインスタンスの this ポインタを得る
-        if (instance != NULL) instance->keyStatus = action; // キーの状態を保存する        
+        if (instance != NULL) {
+            instance->keyStatus = key; // キーの状態を保存する   
+            if(key == GLFW_KEY_R && action == GLFW_PRESS)instance->arcball.reset();
+        }
     }
     
     const GLfloat *getSize() const { return size; }// ウィンドウのサイズを取り出す
     GLfloat getScale() const { return scale; } // ワールド座標系に対するデバイス座標系の拡大率を取り出す
     const GLfloat *getLocation() const { return location; }// 位置を取り出す
-   
+    
+    Eigen::Matrix4d getCameraPosition(){ return arcball.getCameraPosition();}
+
+    
 };

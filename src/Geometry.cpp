@@ -1,5 +1,4 @@
 #include "Geometry.h"
-
 namespace GeoElement{
     Vertex::Vertex(Eigen::Vector3d _p, int _id){
         p = _p; id = _id;
@@ -104,6 +103,7 @@ namespace GeoElement{
     void Mesh::addFace(const std::vector<std::shared_ptr<Vertex> >& vertices){
         std::vector<std::shared_ptr<HalfEdge> > halfEdges;
         for(auto& v: vertices){
+            if(std::find(this->vertices.begin(), this->vertices.end(), v) == this->vertices.end())this->vertices.push_back(v);
             std::shared_ptr<HalfEdge> h = std::make_shared<HalfEdge>(v);
             v->bindHalfEdge(h);
             halfEdges.push_back(h);
@@ -117,12 +117,33 @@ namespace GeoElement{
         for(std::shared_ptr<HalfEdge>& he: halfEdges)he->face = face;
         for(std::shared_ptr<HalfEdge>& he: halfEdges) setHalfEdgePair(he);      
     }
+
     std::vector<std::shared_ptr<Vertex> > Mesh::getTriangleMeshes() {
         std::vector<std::shared_ptr<Vertex> > triangles;
         for (const std::shared_ptr<Face>& face : faces) {
             auto faceTriangles = face->splitTriangles();
+            //triangles = faceTriangles[0];
             for(const auto& triangle: faceTriangles)triangles.insert(triangles.end(), triangle.begin(), triangle.end());
         }
         return triangles;
+    }
+
+    void Mesh::moveCenter(){
+        Eigen::Vector3d sum(0,0,0);
+        for(const std::shared_ptr<Vertex>& v: vertices)sum += v->p;
+        Eigen::Vector3d center = sum / vertices.size();
+        for(const std::shared_ptr<Vertex>& v: vertices)v->p -= center;
+    }
+
+    void Mesh::getSphere(double& r, Eigen::Vector3d& center){
+        Eigen::Vector3d sum(0,0,0);
+        for(const std::shared_ptr<Vertex>& v: vertices)sum += v->p;
+        center = sum / vertices.size();
+        r = 0.0;
+        for(const std::shared_ptr<Vertex>& v: vertices){
+            double dist = (v->p - center).norm();
+            if(dist > r)r = dist;
+        }
+        
     }
 }
