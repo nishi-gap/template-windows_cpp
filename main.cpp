@@ -76,7 +76,7 @@ int main(){
         //const GLfloat scale = window.getScale() * 2.0;      
         const GLfloat fovy(window.getScale() * 0.01);
         const GLfloat aspect(size[0] / size[1]);
-        const GLfloat *const position(window.getLocation()); // 平行移動の変換行列を求める
+        //const GLfloat *const position(window.getLocation()); // 平行移動の変換行列を求める
         //auto r = getRotate(static_cast<double>(glfwGetTime()), Eigen::Vector3d(0,1,0));
         //M_scale(0,0) = scale / size[0]; M_scale(1,1) = scale / size[1];
         
@@ -84,8 +84,8 @@ int main(){
 
         // ビュー変換行列を求める
         Eigen::Vector3d eye(3,3,3), center(target_center), up(0,1,0);
-        const double scale_margin = 1.1;
-        //eye = eye.normalized() * cam_distance * scale_margin;
+        const double scale_margin = 3;
+        eye = eye.normalized() * cam_distance * scale_margin;
 
         Eigen::Matrix4d view = getLookAt(eye, center, up);
         std::vector<GLfloat> view_data = Mat2Array(view * model);
